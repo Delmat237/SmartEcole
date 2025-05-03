@@ -60,6 +60,37 @@ class Teacher(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True, related_name='teachers')
 
+# 7. Service administratif
+class AdministrativeService(models.Model):
+    SERVICE_TYPES = [
+        ('SCOLARITE', 'Scolarité'),
+        ('FINANCIER', 'Financier'),
+        ('AUTRE', 'Autre'),
+    ]
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20, choices=SERVICE_TYPES)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class MembreAdmin(models.Model):
+    ADMIN_TYPES = [
+        ('RESPONSABLE', 'Responsable'),
+        ('AGENT', 'Agent'),
+        ('AUTRE', 'Autre'),
+    ]
+    id = models.AutoField(primary_key=True)
+    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20, choices=ADMIN_TYPES)
+    poste = models.CharField(max_length=100)
+    administrative_service = models.ForeignKey(AdministrativeService, on_delete=models.CASCADE, related_name='membres')
+
+    def __str__(self):
+        return self.name
 # 6. Département
 class Department(models.Model):
     id = models.AutoField(primary_key=True)
@@ -69,35 +100,8 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-# 7. Service administratif
-class AdministrativeService(models.Model):
-    SERVICE_TYPES = [
-        ('SCOLARITE', 'Scolarité'),
-        ('FINANCIER', 'Financier'),
-        ('AUTRE', 'Autre'),
-    ]
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=20, choices=SERVICE_TYPES)
-    description = models.TextField(blank=True)
 
-    def __str__(self):
-        return self.name
 
-# 8. Membre administratif
-class MembreAdmin(models.Model):
-    ADMIN_TYPES = [
-        ('RESPONSABLE', 'Responsable'),
-        ('AGENT', 'Agent'),
-        ('AUTRE', 'Autre'),
-    ]
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=20, choices=ADMIN_TYPES)
-    poste = models.CharField(max_length=100)
-    administrative_service = models.ForeignKey(AdministrativeService, on_delete=models.CASCADE, related_name='membres')
-
-    def __str__(self):
-        return self.name
 
 # 9. Requête
 class Requete(models.Model):

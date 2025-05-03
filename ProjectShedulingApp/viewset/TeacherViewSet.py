@@ -12,7 +12,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response({
             'success': True,
-            'message': 'Liste des personnes récupérée avec succès',
+            'message': 'Liste des enseignants récupérée avec succès',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
@@ -21,7 +21,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response({
             'success': True,
-            'message': 'Personne récupérée avec succès',
+            'message': 'Enseignant récupérée avec succès',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
@@ -31,7 +31,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         return Response({
             'success': True,
-            'message': 'Personne créée avec succès',
+            'message': 'Enseignant créée avec succès',
             'data': serializer.data
         }, status=status.HTTP_201_CREATED)
 
@@ -43,7 +43,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response({
             'success': True,
-            'message': 'Personne modifiée avec succès',
+            'message': 'Enseignant modifiée avec succès',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
@@ -52,6 +52,6 @@ class TeacherViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response({
             'success': True,
-            'message': 'Personne supprimée avec succès',
+            'message': 'Enseignant supprimée avec succès',
             'data': None
         }, status=status.HTTP_204_NO_CONTENT)

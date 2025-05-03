@@ -36,7 +36,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('ProjectShedulingApp.urls')),
-    path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
-    path('api/swagger/', SpectacularSwaggerView.as_view(url_name='api-schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='api-schema'), name='redoc'),
+    path('schema/', SpectacularAPIView.as_view(), name='api-schema'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='api-schema'), name='swagger-ui'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='api-schema'), name='redoc'),
 ]

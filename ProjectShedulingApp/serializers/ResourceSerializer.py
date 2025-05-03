@@ -1,53 +1,22 @@
-from ProjectShedulingApp.models import SalleDeClasse, Ordinateur, VideoProjecteur
 from rest_framework import serializers
+from ProjectShedulingApp.models import MaterielPedagogique, Ordinateur, VideoProjecteur, SalleDeClasse
 
-
-class MaterielPedagogiqueSerializer(serializers.Serializer):
-    nom = serializers.CharField(max_length=100)
-    description = serializers.CharField(allow_blank=True)
-    categorie = serializers.CharField(max_length=50)
-    disponible = serializers.BooleanField(default=True)
-
-
-class OrdinateurSerializer(serializers.ModelSerializer):
+class MaterielPedagogiqueSerializer(serializers.ModelSerializer):
     class Meta:
+        model = MaterielPedagogique
+        fields = ['id', 'nom', 'description', 'categorie', 'disponible']
+
+class OrdinateurSerializer(MaterielPedagogiqueSerializer):
+    class Meta(MaterielPedagogiqueSerializer.Meta):
         model = Ordinateur
-        fields = [
-            'id',
-            'nom',
-            'description',
-            'categorie',
-            'disponible',
-            'adresse_mac',
-            'processeur',
-            'ram',
-            'stockage'
-        ]
+        fields = MaterielPedagogiqueSerializer.Meta.fields + ['adresse_mac', 'processeur', 'ram', 'stockage']
 
-class VideoProjecteurSerializer(serializers.ModelSerializer):
-    class Meta:
+class VideoProjecteurSerializer(MaterielPedagogiqueSerializer):
+    class Meta(MaterielPedagogiqueSerializer.Meta):
         model = VideoProjecteur
-        fields = [
-            'id',
-            'nom',
-            'description',
-            'categorie',
-            'disponible',
-            'resolution',
-            'connectivite',
-            'luminosite'
-        ]
+        fields = MaterielPedagogiqueSerializer.Meta.fields + ['resolution', 'connectivite', 'luminosite']
 
-
-class SalleDeClasseSerializer(serializers.ModelSerializer):
-    class Meta:
+class SalleDeClasseSerializer(MaterielPedagogiqueSerializer):
+    class Meta(MaterielPedagogiqueSerializer.Meta):
         model = SalleDeClasse
-        fields = [
-            'id',
-            'nom',
-            'description',
-            'categorie',
-            'disponible',
-            'capacite',
-            'numero_salle'
-        ]
+        fields = MaterielPedagogiqueSerializer.Meta.fields + ['capacite', 'numero_salle']

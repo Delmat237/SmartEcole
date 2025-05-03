@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'ProjectShedulingApp',
     'rest_framework',
     'rest_framework.authtoken',  # Ajout de AuthToke
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,10 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 WSGI_APPLICATION = 'ProjectSheduling.wsgi.application'
 

@@ -1,2 +1,7 @@
 from .StudentViewSet import StudentViewSet
 from .TeacherViewSet import TeacherViewSet
+from .OrdinateurViewSet import OrdinateurViewSet
+from .VideoProjecteurViewSet import VideoProjecteurViewSet
+from .SalleDeClasseViewSet import SalleDeClasseViewSet
+from .MembreAdminViewSet import MembreAdminViewSet
+from .AdministrativeServiceViewSet import AdministrativeServiceViewSet
