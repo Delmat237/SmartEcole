@@ -1,4 +1,4 @@
-from ProjectShedulingApp.models import SalleDeClasse, Ordinateur, VideoProjecteur
+from ProjectShedulingApp.models import SalleDeClasse, Ordinateur, VideoProjecteur,ClassRoom
 from rest_framework import serializers
 
 
@@ -51,3 +51,10 @@ class SalleDeClasseSerializer(serializers.ModelSerializer):
             'capacite',
             'numero_salle'
         ]
+
+
+class ClassRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassRoom
+        fields = ['id', 'name', 'capacity', 'building', 'floor', 'room_number', 'has_projector', 'has_computers']
+
