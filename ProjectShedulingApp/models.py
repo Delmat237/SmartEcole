@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from django.core.exceptions import ValidationError
 
 # 1. Catégorie de ressource
 class CategoryResource(models.Model):
@@ -248,4 +249,48 @@ class Service(models.Model):
         
     def __str__(self):
         return self.name
+
+
+
+class Reservation(models.Model):
+    """
+    Réservation d'une ressource
+    """
+    STATUS_CHOICES = (
+        ('pending', 'En attente'),
+        ('approved', 'Approuvée'),
+        ('rejected', 'Rejetée'),
+        ('cancelled', 'Annulée'),
+    )
+
+    requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reservations')
+    resource_type = models.CharField(max_length=20, choices=[('classroom', 'Salle de classe'), ('computer', 'Ordinateur'), ('projector', 'Vidéo projecteur')])
+    classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True, blank=True, related_name='reservations')
+    computer = models.ForeignKey(Computer, on_delete=models.CASCADE, null=True, blank=True, related_name='reservations')
+    projector = models.ForeignKey(Projector, on_delete=models.CASCADE, null=True, blank=True, related_name='reservations')
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    purpose = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    approved_by = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_reservations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Réservation"
+        verbose_name_plural = "Réservations"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Réservation ({self.resource_type}) - {self.requester.username} ({self.start_datetime.strftime('%d/%m/%Y')})"
+
+    def cancel_reservation(self):
+        """Annuler la réservation."""
+        if self.status in ['approved', 'pending']:
+            self.status = 'cancelled'
+            self.save()
+        else:
+            raise ValidationError("Impossible d'annuler une réservation déjà rejetée ou annulée.")
+
 

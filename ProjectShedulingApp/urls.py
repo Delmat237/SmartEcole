@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from ProjectShedulingApp.viewset.StudentViewSet import LoginStudentAPIView
 from ProjectShedulingApp.viewset.TeacherViewSet import LoginTeacherAPIView,LoginMembreAdminAPIView
 
-from ProjectShedulingApp.viewset import StudentViewSet,TeacherViewSet,ResourceViewSet
+from ProjectShedulingApp.viewset import StudentViewSet,TeacherViewSet,ResourceViewSet,ContextViewset
 from ProjectShedulingApp.viewset.servicesViewSet import ServiceViewSet
 # from ProjectShedulingApp.viewset import (
 #     CategoryResourceViewSet, ResourceViewSet, ReservationViewSet,
@@ -35,5 +35,6 @@ urlpatterns = [
     path('login-student/', LoginStudentAPIView.as_view(), name='api-loginstudent'),
     path('login-teacher/', LoginTeacherAPIView.as_view(), name='api-loginteacher'),
     path('login-admin/', LoginTeacherAPIView.as_view(), name='api-loginadmin'),
+    path('context/', ContextViewset.ContextViewset.as_view(), name='context'),
 
 ]
