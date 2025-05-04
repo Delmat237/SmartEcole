@@ -14,7 +14,7 @@ from drf_yasg import openapi
 class MembreAdminViewSet(viewsets.ModelViewSet):
     queryset = MembreAdmin.objects.all()
     serializer_class = MembreAdminSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)

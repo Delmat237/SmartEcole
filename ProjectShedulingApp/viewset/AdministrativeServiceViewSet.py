@@ -13,6 +13,7 @@ from rest_framework import status
 class AdministrativeServiceViewSet(viewsets.ModelViewSet):
     queryset = AdministrativeService.objects.all()
     serializer_class = AdministrativeServiceSerializer
+    permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
         try :
@@ -58,6 +59,22 @@ class MembreAdminViewSet(viewsets.ModelViewSet):
             'message': 'Membre administratif récupéré avec succès',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Membre administratif créé avec succès',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({
+                'success': False,
+                'message': 'Erreur lors de la création du membre administratif',
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginMembreAdminAPIView(APIView):
     """
@@ -76,14 +93,12 @@ class LoginMembreAdminAPIView(APIView):
         try:
             serializer = LoginMembreAdminSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            email = serializer.validated_data.get('email')
-            password = serializer.validated_data.get('password')
-
-            try:
-                user = MembreAdmin.objects.get(email=email)
-                if user.check_password(password):  # Vérification du mot de passe
-                    token, _ = Token.objects.get_or_create(user=user)
-                    return Response({
+            user = MembreAdmin.validated_data
+            
+            
+ 
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
                         'success': True,
                         'message': 'Connexion réussie',
                         'data': {
@@ -91,16 +106,8 @@ class LoginMembreAdminAPIView(APIView):
                             'user': LoginMembreAdminSerializer(user).data
                         }
                     }, status=status.HTTP_200_OK)
-                else:
-                    return Response({
-                        'success': False,
-                        'message': "Mot de passe incorrect"
-                    }, status=status.HTTP_400_BAD_REQUEST)
-            except MembreAdmin.DoesNotExist:
-                return Response({
-                    'success': False,
-                    'message': "Utilisateur non trouvé"
-                }, status=status.HTTP_400_BAD_REQUEST)
+               
+          
 
         except ValidationError as e:
             return Response({

@@ -17,39 +17,27 @@ def create_student(matricule, email, phone_number, niveau, password):
     user.set_password(password)  # 🔐 Hash du mot de passe
     user.save()
 
+    try:
     # 🔥 Créer le Student associé
-    student = Student.objects.create(
-        user=user,
-        matricule=matricule,
-        email=email,
-        phone_number=phone_number,
-        niveau=niveau
-    )
+        student = Student.objects.create(
+            user=user,
+            matricule=matricule,
+            email=email,
+            phone_number=phone_number,
+            
+        )
 
-    return student
+        return student
+    except Exception as e:
+        # Si l'utilisateur existe déjà, on lève une exception
+        raise ValidationError("L'utilisateur existe déjà avec ce matricule ou email.")
 
 
-
-def create_teacher(matricule, email, phone_number, niveau, password):
-    # 🔥 Créer le CustomUser lié
-    user = CustomUser.objects.create(username=matricule, user_type="student")
-    user.set_password(password)  # 🔐 Hash du mot de passe
-    user.save()
-
-    # 🔥 Créer le Student associé
-    teacher = Teacher.objects.create(
-        user=user,
-        matricule=matricule,
-        email=email,
-        phone_number=phone_number,
-        niveau=niveau
-    )
-
-    return teacher
 
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    permission_classes = [AllowAny]
    
 
     def list(self, request, *args, **kwargs):
@@ -88,7 +76,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             return Response({
                 'success': False,
                 'message': 'Erreur lors de la création de l\'étudiant',
-                'error': str(e)
+                'error': "Matricule ou email déjà utilisé"
             }, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
@@ -119,14 +107,7 @@ class LoginStudentAPIView(APIView):
     permission_classes = [AllowAny]
     @extend_schema(
         request=LoginStudentSerializer,
-        #request_body=openapi.Schema(
-        #type=openapi.TYPE_OBJECT,
-        #properties={
-            #'email': openapi.Schema(type=openapi.TYPE_STRING),
-            #'password': openapi.Schema(type=openapi.TYPE_STRING),
-        #},
-        #required=['email', 'password']
-    #),
+
         responses={
             200: openapi.Response(description="Connexion réussie"),
             400: openapi.Response(description="Échec de connexion"),

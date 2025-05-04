@@ -107,9 +107,6 @@ class AdministrativeService(models.Model):
     type = models.CharField(max_length=20, choices=SERVICE_TYPES)
     description = models.TextField(blank=True)
 
-    def __str__(self):
-        return self.name
-
 # 8. Membre administratif
 class MembreAdmin(models.Model):
     ADMIN_TYPES = [
@@ -122,9 +119,8 @@ class MembreAdmin(models.Model):
     type = models.CharField(max_length=20, choices=ADMIN_TYPES)
     poste = models.CharField(max_length=100)
     administrative_service = models.ForeignKey(AdministrativeService, on_delete=models.CASCADE, related_name='membres')
-
-    def __str__(self):
-        return self.name
+    password = models.CharField(max_length=128, default="nothing")
+    email = models.EmailField(max_length=255, unique=True,default="aza@gmail.com")
 
 # 9. Requête
 class Requete(models.Model):
