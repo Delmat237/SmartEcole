@@ -1,19 +1,56 @@
-from rest_framework import viewsets, status, serializers
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework.authtoken.models import Token
-from drf_yasg import openapi
+from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema
 from ProjectShedulingApp.models import Student
-from ProjectShedulingApp.serializers.LoginSerializer import LoginStudentSerializer
-from ProjectShedulingApp.serializers.PersonSerializer import StudentSerializer
+from rest_framework.authtoken.models import Token
+from ProjectShedulingApp.serializers.PersonSerializer import StudentSerializer, LoginStudentSerializer
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotAuthenticated
+from ProjectShedulingApp.models import CustomUser, Student,Teacher
+
+def create_student(matricule, email, phone_number, niveau, password):
+    # 🔥 Créer le CustomUser lié
+    user = CustomUser.objects.create(username=matricule, user_type="student")
+    user.set_password(password)  # 🔐 Hash du mot de passe
+    user.save()
+
+    # 🔥 Créer le Student associé
+    student = Student.objects.create(
+        user=user,
+        matricule=matricule,
+        email=email,
+        phone_number=phone_number,
+        niveau=niveau
+    )
+
+    return student
+
+
+
+def create_teacher(matricule, email, phone_number, niveau, password):
+    # 🔥 Créer le CustomUser lié
+    user = CustomUser.objects.create(username=matricule, user_type="student")
+    user.set_password(password)  # 🔐 Hash du mot de passe
+    user.save()
+
+    # 🔥 Créer le Student associé
+    teacher = Teacher.objects.create(
+        user=user,
+        matricule=matricule,
+        email=email,
+        phone_number=phone_number,
+        niveau=niveau
+    )
+
+    return teacher
 
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [AllowAny]
+   
 
     def list(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
@@ -33,14 +70,21 @@ class StudentViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        matricule = request.data.get("matricule")
+        email = request.data.get("email")
+        phone_number = request.data.get("phone_number")
+        niveau = request.data.get("niveau")
+        password = request.data.get("password")
+
+        student = create_student(matricule, email, phone_number, niveau, password)  # 🔥 Création via la fonction utilitaire
+
+        serializer = StudentSerializer(student)  # Sérialisation de l'objet créé
         return Response({
             'success': True,
             'message': 'Étudiant créé avec succès',
             'data': serializer.data
-        }, status=status.HTTP_201_CREATED)
+        }, status=status.HTTP_201_CREATED)  # Correction ici : `status.HTTP_201_CREATED`
+
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -63,16 +107,21 @@ class StudentViewSet(viewsets.ModelViewSet):
             'data': None
         }, status=status.HTTP_204_NO_CONTENT)
 
-
 class LoginStudentAPIView(APIView):
     """
     API pour se connecter avec email et mot de passe.
     """
-    serializer_class = LoginStudentSerializer
     permission_classes = [AllowAny]
-    
-    @swagger_auto_schema(
-        request_body=LoginStudentSerializer,
+    @extend_schema(
+        request=LoginStudentSerializer,
+        #request_body=openapi.Schema(
+        #type=openapi.TYPE_OBJECT,
+        #properties={
+            #'email': openapi.Schema(type=openapi.TYPE_STRING),
+            #'password': openapi.Schema(type=openapi.TYPE_STRING),
+        #},
+        #required=['email', 'password']
+    #),
         responses={
             200: openapi.Response(description="Connexion réussie"),
             400: openapi.Response(description="Échec de connexion"),
@@ -82,9 +131,8 @@ class LoginStudentAPIView(APIView):
         try:
             serializer = LoginStudentSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            user = serializer.validated_data  # L'utilisateur authentifié
-            # Générer ou récupérer le token associé à cet utilisateur
-            token, created = Token.objects.get_or_create(user=user)
+            user = serializer.validated_data
+            token, _ = Token.objects.get_or_create(user=user)
             return Response({
                 'success': True,
                 'message': 'Connexion réussie',

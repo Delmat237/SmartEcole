@@ -1,5 +1,5 @@
-from .StudentViewSet import StudentViewSet, LoginStudentAPIView
-from .TeacherViewSet import TeacherViewSet, LoginTeacherAPIView
+from .StudentViewSet import StudentViewSet,LoginStudentAPIView
+from .TeacherViewSet import TeacherViewSet,LoginTeacherAPIView
 from .MembreAdminViewSet import MembreAdminViewSet, LoginMembreAdminAPIView
 from .OrdinateurViewSet import OrdinateurViewSet
 from .VideoProjecteurViewSet import VideoProjecteurViewSet
@@ -8,3 +8,4 @@ from .MembreAdminViewSet import MembreAdminViewSet
 from .AdministrativeServiceViewSet import AdministrativeServiceViewSet
 from .ReservationViewSet import ReservationViewSet
 from .RequeteViewSet import RequeteViewSet
+from .DepartmentViewSet import DepartmentViewSet

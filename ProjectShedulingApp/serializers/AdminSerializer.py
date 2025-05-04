@@ -16,7 +16,7 @@ class MembreAdminSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MembreAdmin
-        fields = ['id', 'password', 'name', 'type', 'poste', 'administrative_service', 'administrative_service_id']
+        fields = ['id', 'name', 'type', 'poste', 'administrative_service', 'administrative_service_id']
 
 class LoginMembreAdminSerializer(serializers.Serializer):
     email = serializers.EmailField()

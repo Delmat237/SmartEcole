@@ -2,6 +2,7 @@ from django.urls import include,path
 from rest_framework.routers import DefaultRouter
 
 from ProjectShedulingApp.viewset import ( 
+  
     StudentViewSet,
     TeacherViewSet,
     OrdinateurViewSet,
@@ -10,12 +11,13 @@ from ProjectShedulingApp.viewset import (
     MembreAdminViewSet,
       AdministrativeServiceViewSet,
     ReservationViewSet,
+    RequeteViewSet,
+    DepartmentViewSet,
     LoginTeacherAPIView,
-    LoginStudentAPIView,
-    LoginMembreAdminAPIView,
-    RequeteViewSet
-
+   LoginStudentAPIView,
+    LoginMembreAdminAPIView
 )
+# from ProjectShedulingApp.viewset.ContextViewset import ContextViewSet
 
 
 
@@ -23,13 +25,15 @@ router = DefaultRouter()
 
 router.register(r'students', StudentViewSet)
 router.register(r'teachers', TeacherViewSet)
-router.register(r'ordinateurs', OrdinateurViewSet)
-router.register(r'video-projecteurs', VideoProjecteurViewSet)
-router.register(r'salles-de-classe', SalleDeClasseViewSet)
+router.register(r'computers', OrdinateurViewSet)
+router.register(r'projectors', VideoProjecteurViewSet)
+router.register(r'classrooms', SalleDeClasseViewSet)
 router.register(r'services-administratifs', AdministrativeServiceViewSet)
 router.register(r'membres-administratifs', MembreAdminViewSet)
 router.register(r'reservations', ReservationViewSet)
-router.register(r'requetes', RequeteViewSet)
+router.register(r'requests', RequeteViewSet)
+router.register(r'departments', DepartmentViewSet)  # Ajout de l'URL pour le département
+# router.register(r'context', ContextViewSet)  # Ajout de l'URL pour le contexte
 
 urlpatterns = [
     path('', include(router.urls)),

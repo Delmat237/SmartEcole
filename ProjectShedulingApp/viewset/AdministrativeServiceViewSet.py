@@ -8,18 +8,26 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from ProjectShedulingApp.serializers.AdminSerializer import LoginMembreAdminSerializer, AdministrativeServiceSerializer, MembreAdminSerializer
 from ProjectShedulingApp.models import MembreAdmin, AdministrativeService
+from rest_framework import status
 
 class AdministrativeServiceViewSet(viewsets.ModelViewSet):
     queryset = AdministrativeService.objects.all()
     serializer_class = AdministrativeServiceSerializer
 
     def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({
-            'success': True,
-            'message': 'Liste des services administratifs récupérée avec succès',
-            'data': serializer.data
-        }, status=status.HTTP_200_OK)
+        try :
+            serializer = self.get_serializer(self.get_queryset(), many=True)
+            return Response({
+                'success': True,
+                'message': 'Liste des services administratifs récupérée avec succès',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)  #
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Erreur lors de la récupération des services administratifs',
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
