@@ -75,16 +75,21 @@ class StudentViewSet(viewsets.ModelViewSet):
         phone_number = request.data.get("phone_number")
         niveau = request.data.get("niveau")
         password = request.data.get("password")
+        try:
+                student = create_student(matricule, email, phone_number, niveau, password)  # 🔥 Création via la fonction utilitaire
 
-        student = create_student(matricule, email, phone_number, niveau, password)  # 🔥 Création via la fonction utilitaire
-
-        serializer = StudentSerializer(student)  # Sérialisation de l'objet créé
-        return Response({
-            'success': True,
-            'message': 'Étudiant créé avec succès',
-            'data': serializer.data
-        }, status=status.HTTP_201_CREATED)  # Correction ici : `status.HTTP_201_CREATED`
-
+                serializer = StudentSerializer(student)  # Sérialisation de l'objet créé
+                return Response({
+                    'success': True,
+                    'message': 'Étudiant créé avec succès',
+                    'data': serializer.data
+                }, status=status.HTTP_201_CREATED)  # Correction ici : `status.HTTP_201_CREATED`
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Erreur lors de la création de l\'étudiant',
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
