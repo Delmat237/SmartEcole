@@ -1,7 +1,10 @@
-from .StudentViewSet import StudentViewSet
-from .TeacherViewSet import TeacherViewSet
+from .StudentViewSet import StudentViewSet, LoginStudentAPIView
+from .TeacherViewSet import TeacherViewSet, LoginTeacherAPIView
+from .MembreAdminViewSet import MembreAdminViewSet, LoginMembreAdminAPIView
 from .OrdinateurViewSet import OrdinateurViewSet
 from .VideoProjecteurViewSet import VideoProjecteurViewSet
 from .SalleDeClasseViewSet import SalleDeClasseViewSet
 from .MembreAdminViewSet import MembreAdminViewSet
 from .AdministrativeServiceViewSet import AdministrativeServiceViewSet
+from .ReservationViewSet import ReservationViewSet
+from .RequeteViewSet import RequeteViewSet

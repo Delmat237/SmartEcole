@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 # 1. Catégorie de ressource
 class CategoryResource(models.Model):
@@ -36,30 +39,37 @@ class SalleDeClasse(MaterielPedagogique):
     capacite = models.IntegerField()  
     numero_salle = models.CharField(max_length=10, unique=True)
 
-# 3. Personne (abstrait)
-class Person(AbstractUser):
+
+# 6. Département
+class Department(models.Model):
     id = models.AutoField(primary_key=True)
-    avatar = models.ImageField(verbose_name="avatar", upload_to="profile_photos/", blank=True, null=True) 
-    matricule = models.CharField(max_length=50, unique=True)
-    phoneNumber = models.CharField(max_length=20)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
 
-    class Meta:
-        abstract = True
-
-# Nouveau modèle User concret
-class CustomUser(Person):
-    class Meta:
-        verbose_name = "Utilisateur"
-        verbose_name_plural = "Utilisateurs"
-
+    
 class Student(models.Model):
-    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    niveau = models.CharField(max_length=50)
+    matricule = models.CharField(max_length=50, unique=True)  # Identifiant unique
+    niveau = models.IntegerField()
+    name = models.CharField(max_length=100)  # Nom de l'étudiant
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    password = models.CharField(max_length=255)  # Mot de passe pour l'authentification
+    phone_number = models.CharField(max_length=20)
+    role = models.CharField(max_length=20, default='student')  # Rôle par défaut
 
 class Teacher(models.Model):
-    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True, related_name='teachers')
-
+    matricule = models.CharField(max_length=50, unique=True)  # Identifiant unique
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    password = models.CharField(max_length=255)  
+    phone_number = models.CharField(max_length=20)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
+    role = models.CharField(max_length=20, default='teacher')  # Rôle par défaut
+  
+    
 # 7. Service administratif
 class AdministrativeService(models.Model):
     SERVICE_TYPES = [
@@ -72,9 +82,6 @@ class AdministrativeService(models.Model):
     type = models.CharField(max_length=20, choices=SERVICE_TYPES)
     description = models.TextField(blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class MembreAdmin(models.Model):
     ADMIN_TYPES = [
@@ -82,45 +89,68 @@ class MembreAdmin(models.Model):
         ('AGENT', 'Agent'),
         ('AUTRE', 'Autre'),
     ]
-    id = models.AutoField(primary_key=True)
-    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
+    matricule = models.CharField(max_length=50, unique=True)  # Identifiant unique
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=20, choices=ADMIN_TYPES)
     poste = models.CharField(max_length=100)
     administrative_service = models.ForeignKey(AdministrativeService, on_delete=models.CASCADE, related_name='membres')
-
-    def __str__(self):
-        return self.name
-# 6. Département
-class Department(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name
+    email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=20)
+    password = models.CharField(max_length=255)  # Mot de passe pour l'authentification
+    role = models.CharField(max_length=20, default='admin')  # Rôle par défaut
 
 
-
-
-# 9. Requête
 class Requete(models.Model):
     STATUS_CHOICES = [
         ('EN_ATTENTE', 'En attente'),
         ('TRAITEE', 'Traitée'),
         ('REFUSEE', 'Refusée'),
     ]
+
+    objet = models.CharField(max_length=255)  # Le sujet ou le titre de la requête
     date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    administrative_service = models.ForeignKey(AdministrativeService, on_delete=models.CASCADE, related_name='requetes')
-    personne = models.ForeignKey('PersonneBase', on_delete=models.CASCADE, related_name='requetes')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='EN_ATTENTE')
+    administrative_service = models.ForeignKey(
+        'AdministrativeService',
+        on_delete=models.CASCADE,
+        related_name='requetes'
+    )
+    personne = models.ForeignKey(
+        'PersonneBase',
+        on_delete=models.CASCADE,
+        related_name='requetes'
+    )
+    pieces_jointes = models.FileField(
+        upload_to='requetes/pieces_jointes/',
+        null=True,
+        blank=True
+    )  # Optionnel
 
 # 10. Personne de base pour gestion générique
 class PersonneBase(models.Model):
+    matricule = models.CharField(max_length=50, unique=True)  # Identifiant unique
     name = models.CharField(max_length=100)
-    matricule = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
-    phoneNumber = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20)
 
-    def __str__(self):
-        return self.name
+
+class Reservation(models.Model):
+    STATUS_CHOICES = [
+        ('EN_ATTENTE', 'En attente'),
+        ('VALIDEE', 'Validée'),
+        ('REFUSEE', 'Refusée'),
+        ('ANNULEE', 'Annulée'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    
+    # Champs pour lien générique vers ordinateur, vidéoprojecteur ou salle
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    ressource = GenericForeignKey('content_type', 'object_id')
+
+    date_debut = models.DateTimeField()
+    date_fin = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='EN_ATTENTE')
+    created_at = models.DateTimeField(auto_now_add=True)
+

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ProjectShedulingApp.models import MembreAdmin, AdministrativeService, CustomUser
+from ProjectShedulingApp.models import MembreAdmin, AdministrativeService
 
 class AdministrativeServiceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,4 +16,26 @@ class MembreAdminSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MembreAdmin
-        fields = ['id', 'user', 'name', 'type', 'poste', 'administrative_service', 'administrative_service_id']
+        fields = ['id', 'password', 'name', 'type', 'poste', 'administrative_service', 'administrative_service_id']
+
+class LoginMembreAdminSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    # Méthode de validation pour vérifier que les identifiants sont corrects
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        try:
+            user = MembreAdmin.objects.get(email=email)
+        except MembreAdmin.DoesNotExist:
+            raise serializers.ValidationError("Email ou mot de passe invalide")
+
+        if not user.check_password(password):
+            raise serializers.ValidationError("Email ou mot de passe invalide")
+
+        if not user.is_active:
+            raise serializers.ValidationError("Informations invalide.")
+
+        return user
