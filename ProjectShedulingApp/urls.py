@@ -15,7 +15,8 @@ from ProjectShedulingApp.viewset import (
     DepartmentViewSet,
     LoginTeacherAPIView,
    LoginStudentAPIView,
-    LoginMembreAdminAPIView
+    LoginMembreAdminAPIView,
+    ContextViewSet
 )
 # from ProjectShedulingApp.viewset.ContextViewset import ContextViewSet
 
@@ -33,7 +34,7 @@ router.register(r'membres-administratifs', MembreAdminViewSet)
 router.register(r'reservations', ReservationViewSet)
 router.register(r'requests', RequeteViewSet)
 router.register(r'departments', DepartmentViewSet)  # Ajout de l'URL pour le département
-# router.register(r'context', ContextViewSet)  # Ajout de l'URL pour le contexte
+router.register(r'context', ContextViewSet,basename='context')  # Ajout de l'URL pour le contexte
 
 urlpatterns = [
     path('', include(router.urls)),

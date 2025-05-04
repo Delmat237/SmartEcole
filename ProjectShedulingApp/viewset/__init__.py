@@ -9,3 +9,4 @@ from .AdministrativeServiceViewSet import AdministrativeServiceViewSet
 from .ReservationViewSet import ReservationViewSet
 from .RequeteViewSet import RequeteViewSet
 from .DepartmentViewSet import DepartmentViewSet
+from .ContextViewSet import ContextViewSet

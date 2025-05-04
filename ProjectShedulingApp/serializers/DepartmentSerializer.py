@@ -1,7 +1,9 @@
-from ProjectShedulingApp.models import Department
+# serializers/DepartmentSerializer.py
+
 from rest_framework import serializers
+from ProjectShedulingApp.models import Department
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ['id', 'name', 'description']
+        fields = '__all__'
